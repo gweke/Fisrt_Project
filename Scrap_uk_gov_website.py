@@ -16,29 +16,36 @@ page=requests.get(url)
 #parsing du contenu de la page (variable page) avec BeautifulSoup
 soup = BeautifulSoup(page.content, 'html.parser')
 
+'''
+Extraction des titres et descriptions utilisent le meme codage et processus,
+alors nous allons le mettre comme une fonction extraire_donnees
+'''
+def extraire_donnees (contenus_extrait):
+	resutlat = []
+	for contenu in contenus_extrait:
+		resutlat.append(contenu.string)
+		#print(contenu.string)
 
-#Extraction des titres et les stocker dans une liste
+	return resutlat
+
 # la variable pour stocker les titres
 titres_texte = [] 		
+
+#extraction des titres entre la balise a avec comme class celle specifiee
 titres = soup.find_all('a', class_='gem-c-document-list__item-title')
-for titre in titres:
-	if(titre.string != ''):
-		titres_texte.append(titre.string)
-		#print(titre.string + '__________')
+titres_texte = extraire_donnees(titres)
 
-#Extraction des descriptions et les stocker dans une liste
 # la variable pour stocker les descriptions
-descriptions_texte = [] 		
-descriptions = soup.find_all('p', class_='gem-c-document-list__item-description')
-for description in descriptions:
-	if description.string != '':
-		descriptions_texte.append(description.string)
-		#print(description.string + '_________')
+descriptions_texte = [] 
 
+#extraction des descriptions entre la balise p avec comme class celle specifiee
+descriptions = soup.find_all('p', class_='gem-c-document-list__item-description')
+descriptions_texte = extraire_donnees(descriptions)
 
 #Creation du fichier data.csv
 entete = ['Titres', 'Descriptions']
 with open('data_uk.csv', 'w') as csv_file:
+	#le dialect='unix' permet d'éviter des lignes vides dans le fichier excel
 	writer = csv.writer(csv_file, dialect = 'unix', delimiter='|')
 	writer.writerow(entete)
 	for titre, description in zip(titres_texte, descriptions_texte):
